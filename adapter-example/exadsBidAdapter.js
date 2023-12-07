@@ -1,7 +1,6 @@
 import * as utils from '../src/utils';
 import {BANNER} from '../src/mediaTypes.js';
 import {registerBidder} from '../src/adapters/bidderFactory';
-//import { config }           from '../src/config';
 
 const BIDDER_CODE = 'exadsadserver';
 
@@ -49,7 +48,7 @@ export const spec = {
             console.log("---------------------------------------");
         }
 
-        return !!(bid.params.userIp && bid.params.zoneId && bid.params.fid);
+        return !!(bid.params.ip && bid.params.zoneId && bid.params.fid);
     },
     buildRequests: function (validBidRequests, bidderRequest) {
         if (debug) {
@@ -75,7 +74,7 @@ export const spec = {
                 },
                 "device": {
                     "ua": user_agent,
-                    "ip": bid.params.userIp,
+                    "ip": bid.params.ip,
                     "language": lang,
                     "os": os_name,
                     "js": 1,

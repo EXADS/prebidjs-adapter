@@ -19,10 +19,10 @@
         let adUnits = [];
         // Client Conf end
 
-        let PREBID_TIMEOUT = 5000;
-        let userIp = 0;
-        let userIpLoaded = false;
-        let impression_id = hashCode(new Date().getTime().toString());
+        const timeout = 1000;
+        let ip = 0;
+        let ipLoaded = false;
+        let impressionId = hashCode(new Date().getTime().toString());
 
         let ip_script = document.createElement("script");
         ip_script.type = "text/javascript";
@@ -41,8 +41,8 @@
 
         // ======== DO NOT EDIT BELOW THIS LINE =========== //
         function userIpCallback(user_ip) {
-            userIpLoaded = true;
-            if (user_ip.hasOwnProperty('ip')) userIp = user_ip.ip;
+            ipLoaded = true;
+            if (user_ip.hasOwnProperty('ip')) ip = user_ip.ip;
         }
 
         function hashCode(str, seed = 0) {
@@ -72,8 +72,8 @@
                         fid: fid,
                         siteId: siteId,
                         catIab: catIab,
-                        userIp: 0,
-                        impressionId: impression_id.toString(),
+                        ip: 0,
+                        impressionId: impressionId.toString(),
                         endpoint: exads_endpoint
                     }
                 }]
@@ -82,19 +82,19 @@
 
         // Init when IP data is available
         function initBids() {
-            if (userIpLoaded === false) {
+            if (ipLoaded === false) {
                 window.setTimeout(initBids, 50);
             } else {
                 for (let i = 0; i < adUnits.length; i++) {
                     for (let t = 0; t < adUnits[i].bids.length; t++) {
-                        adUnits[i].bids[t].params.userIp = userIp;
+                        adUnits[i].bids[t].params.ip = ip;
                     }
                 }
 
                 pbjs.que.push(function () {
                     pbjs.addAdUnits(adUnits);
                     pbjs.requestBids({
-                        timeout: PREBID_TIMEOUT,
+                        timeout: timeout,
                         bidsBackHandler: function () {
                             let iframe = document.getElementById('postbid_iframe');
                             let iframeDoc = iframe.contentWindow.document;
