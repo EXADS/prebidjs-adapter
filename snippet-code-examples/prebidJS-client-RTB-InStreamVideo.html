@@ -15,7 +15,7 @@
             [300, 250]
         ];
         let catIab = []; // if available - ex.: ["IAB1-5", "IAB1-7"]
-        const exads_endpoint = 'https://rtb.exads.rocks/rtb.php';
+        const endpoint = 'https://rtb.exads.rocks/rtb.php';
         let adUnits = [];
         // Client Conf end
 
@@ -40,9 +40,9 @@
         handleRTB();
 
         // ======== DO NOT EDIT BELOW THIS LINE =========== //
-        function userIpCallback(user_ip) {
+        function userIpCallback(userIp) {
             ipLoaded = true;
-            if (user_ip.hasOwnProperty('ip')) ip = user_ip.ip;
+            if (userIp.hasOwnProperty('ip')) ip = userIp.ip;
         }
 
         function hashCode(str, seed = 0) {
@@ -76,7 +76,7 @@
                         catIab: catIab,
                         ip: 0, // DO NOT EDIT - Client side data
                         impressionId: impressionId.toString(), // DO NOT EDIT - Custom hash
-                        endpoint: exads_endpoint
+                        endpoint: endpoint
                     }
                 }]
             }];
