@@ -8,21 +8,21 @@
     <script>
         // Client Conf start
         //http://rtb.exads.rocks/rtb.php?idzone=5102563&fid=e14da4477edb2effaedd1e2f56501f1151f588fc
-        let zoneId = 5116965;
-        let fid = "99e685e37c48e7bb9dad3fc7e43dec630d2581fc";
+        let zoneId = 5147485;
+        let fid = "829a896f011475d505a0d89cfdd1af8d9cdb07ff";
         let siteId = "12345";
         let bannerSizes = [
             [300, 250]
         ];
-        let catIab = []; // if available - ex.: ["IAB1-5", "IAB1-7"]
-        const endpoint = 'https://rtb.exads.rocks/rtb.php';
+        let catIab = ['IAB25-3']; // if available - ex.: ["IAB1-5", "IAB1-7"]
+        const exads_endpoint = 'https://rtb.exads.rocks/rtb.php';
         let adUnits = [];
         // Client Conf end
 
-        const timeout = 1000;
-        let ip = 0;
-        let ipLoaded = false;
-        let impressionId = hashCode(new Date().getTime().toString());
+        let PREBID_TIMEOUT = 5000;
+        let userIp = 0;
+        let userIpLoaded = false;
+        let impression_id = hashCode(new Date().getTime().toString());
 
         let ip_script = document.createElement("script");
         ip_script.type = "text/javascript";
@@ -40,9 +40,9 @@
         handleRTB();
 
         // ======== DO NOT EDIT BELOW THIS LINE =========== //
-        function userIpCallback(userIp) {
-            ipLoaded = true;
-            if (userIp.hasOwnProperty('ip')) ip = userIp.ip;
+        function userIpCallback(user_ip) {
+            userIpLoaded = true;
+            if (user_ip.hasOwnProperty('ip')) userIp = user_ip.ip;
         }
 
         function hashCode(str, seed = 0) {
@@ -72,9 +72,13 @@
                         fid: fid,
                         siteId: siteId,
                         catIab: catIab,
-                        ip: 0,
-                        impressionId: impressionId.toString(),
-                        endpoint: endpoint
+                        userIp: 0,
+                        country: 'ITA',
+                        impressionId: impression_id.toString(),
+                        keywords: 'lifestyle, humour',
+                        bidfloor: 0.00000011,
+                        bidfloorcur: 'EUR',
+                        endpoint: exads_endpoint
                     }
                 }]
             }];
@@ -82,19 +86,19 @@
 
         // Init when IP data is available
         function initBids() {
-            if (ipLoaded === false) {
+            if (userIpLoaded === false) {
                 window.setTimeout(initBids, 50);
             } else {
                 for (let i = 0; i < adUnits.length; i++) {
                     for (let t = 0; t < adUnits[i].bids.length; t++) {
-                        adUnits[i].bids[t].params.ip = ip;
+                        adUnits[i].bids[t].params.userIp = userIp;
                     }
                 }
 
                 pbjs.que.push(function () {
                     pbjs.addAdUnits(adUnits);
                     pbjs.requestBids({
-                        timeout: timeout,
+                        timeout: PREBID_TIMEOUT,
                         bidsBackHandler: function () {
                             let iframe = document.getElementById('postbid_iframe');
                             let iframeDoc = iframe.contentWindow.document;

@@ -8,11 +8,10 @@ const BIDDER_CODES = {
 
 const envParams = {
     lang: "",
-    user_agent: "",
-    os_name: "",
+    userAgent: "",
+    osName: "",
     page: "",
-    domain: "",
-    debug: true
+    domain: ""
 };
 
 const adPartnerHandlers = {
@@ -35,16 +34,16 @@ function handleReqRTB_2_4(bid, endpointUrl, validBidRequests, bidderRequest) {
             'domain': envParams.domain,
             'cat': bid.params.catIab,
             'page': envParams.page,
-            'keywords': 'lifestyle, humour'
+            'keywords': bid.params.keywords
         },
         'device': {
-            'ua': envParams.user_agent,
+            'ua': envParams.userAgent,
             'ip': bid.params.userIp,
             'geo': {
-                'country': 'ITA'
+                'country': bid.params.country
             },
             'language': envParams.lang,
-            'os': envParams.os_name,
+            'os': envParams.osName,
             'js': 0,
             'ext': {
                 'remote_addr': '',
@@ -65,8 +64,8 @@ function handleReqRTB_2_4(bid, endpointUrl, validBidRequests, bidderRequest) {
     if (bannerMediaType != null) {
         bidRequestData.imp = bannerMediaType.sizes.map(size => ({
             'id': bid.params.impressionId,
-            'bidfloor': 0.00000011,
-            'bidfloorcur': 'EUR',
+            'bidfloor': bid.params.bidfloor,
+            'bidfloorcur': bid.params.bidfloorcur,
             'banner': {
                 'w': size[0],
                 'h': size[1]
@@ -79,11 +78,11 @@ function handleReqRTB_2_4(bid, endpointUrl, validBidRequests, bidderRequest) {
     if (nativeMediaType != null) {
         const native = {
             "native": {
-                "ver": "1.2",
-                "context": 1,
-                "contextsubtype": 10,
-                "plcmttype": 4,
-                "plcmtcnt": 4
+                "ver": bid.params.native.ver,
+                "context": bid.params.native.context,
+                "contextsubtype": bid.params.native.contextsubtype,
+                "plcmttype": bid.params.native.plcmttype,
+                "plcmtcnt": bid.params.native.plcmtcnt
             }
         };
 
@@ -98,11 +97,11 @@ function handleReqRTB_2_4(bid, endpointUrl, validBidRequests, bidderRequest) {
 
         const imp = [{
             'id': bid.params.impressionId,
-            'bidfloor': 0.00000011,
-            'bidfloorcur': 'EUR',
+            'bidfloor': bid.params.bidfloor,
+            'bidfloorcur': bid.params.bidfloorcur,
             'native': {
                 'request': JSON.stringify(native),
-                "ver": "1.2"
+                "ver": bid.params.native.ver
             },
         }];
 
@@ -117,15 +116,10 @@ function handleReqRTB_2_4(bid, endpointUrl, validBidRequests, bidderRequest) {
         const imp = [{
             'id': bid.params.impressionId,
             'video': {
-                "mimes": ["video/mp4"]
+                "mimes": bid.params.stream.video.mimes
             },
-            "protocols": [
-                3,
-                6
-            ],
-            "ext": {
-                "video_cta": 0
-            }
+            "protocols": bid.params.stream.protocols,
+            "ext": bid.params.stream.ext
         }];
 
         bidRequestData.imp = imp;
@@ -252,32 +246,31 @@ function getUrl(adPartner, bid) {
 }
 
 function manageEnvParams() {
-    envParams.debug = true;
     envParams.domain = window.location.hostname;
     envParams.page = window.location.protocol + '//' + window.location.host + window.location.pathname;
     envParams.lang = navigator.language;
     if (envParams.lang.indexOf('-') > -1) {
         envParams.lang = envParams.lang.split('-')[0];
     }
-    envParams.user_agent = navigator.userAgent;
+    envParams.userAgent = navigator.userAgent;
     if (navigator.appVersion.indexOf('Win') !== -1) {
-        envParams.os_name = 'Windows';
+        envParams.osName = 'Windows';
     }
     if (navigator.appVersion.indexOf('Mac') !== -1) {
-        envParams.os_name = 'MacOS';
+        envParams.osName = 'MacOS';
     }
     if (navigator.appVersion.indexOf('X11') !== -1) {
-        envParams.os_name = 'Unix';
+        envParams.osName = 'Unix';
     }
     if (navigator.appVersion.indexOf('Linux') !== -1) {
-        envParams.os_name = 'Linux';
+        envParams.osName = 'Linux';
     }
 
     utils.logInfo('Domain -> ', envParams.domain);
     utils.logInfo('Page -> ', envParams.page);
     utils.logInfo('Lang -> ', envParams.lang);
-    utils.logInfo('OS -> ', envParams.os_name);
-    utils.logInfo('User Agent -> ', envParams.user_agent);
+    utils.logInfo('OS -> ', envParams.osName);
+    utils.logInfo('User Agent -> ', envParams.userAgent);
 }
 
 const imps = new Map();;

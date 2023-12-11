@@ -8,21 +8,21 @@
     <script>
         // Client Conf start
         //http://rtb.exads.rocks/rtb.php?idzone=5102563&fid=e14da4477edb2effaedd1e2f56501f1151f588fc
-        let zoneId = 5117001;
-        let fid = "c86a0fdb15f3cfd8f5af41227c491c11dc27481d";
+        let zoneId = 5147489;
+        let fid = "72f7f7602626994a76ada610ce3aa7096deabbaf";
         let siteId = "12345";
+        let catIab = ['IAB25-3']; // if available - ex.: ["IAB1-5", "IAB1-7"]
         let bannerSizes = [
             [300, 250]
         ];
-        let catIab = []; // if available - ex.: ["IAB1-5", "IAB1-7"]
-        const endpoint = 'https://rtb.exads.rocks/rtb.php';
+        const exads_endpoint = 'https://rtb.exads.rocks/rtb.php';
         let adUnits = [];
         // Client Conf end
 
-        const timeout = 1000;
-        let ip = 0;
-        let ipLoaded = false;
-        let impressionId = hashCode(new Date().getTime().toString());
+        let PREBID_TIMEOUT = 5000;
+        let userIp = 0;
+        let userIpLoaded = false;
+        let impression_id = hashCode(new Date().getTime().toString());
 
         let ip_script = document.createElement("script");
         ip_script.type = "text/javascript";
@@ -40,9 +40,9 @@
         handleRTB();
 
         // ======== DO NOT EDIT BELOW THIS LINE =========== //
-        function userIpCallback(userIp) {
-            ipLoaded = true;
-            if (userIp.hasOwnProperty('ip')) ip = userIp.ip;
+        function userIpCallback(user_ip) {
+            userIpLoaded = true;
+            if (user_ip.hasOwnProperty('ip')) userIp = user_ip.ip;
         }
 
         function hashCode(str, seed = 0) {
@@ -73,10 +73,24 @@
                         zoneId: zoneId,
                         fid: fid,
                         siteId: siteId,
+                        userIp: 0, // DO NOT EDIT - Client side data
+                        impressionId: impression_id.toString(), // DO NOT EDIT - Custom hash
+                        stream: {
+                            video: {
+                                mimes: ['video/mp4']
+                            },
+                            protocols: [
+                                3,
+                                6
+                            ],
+                            ext: {
+                                video_cta: 0
+                            }
+                        },
+                        country: 'ITA',
+                        keywords: 'lifestyle, humour',
                         catIab: catIab,
-                        ip: 0, // DO NOT EDIT - Client side data
-                        impressionId: impressionId.toString(), // DO NOT EDIT - Custom hash
-                        endpoint: endpoint
+                        endpoint: exads_endpoint
                     }
                 }]
             }];
@@ -84,19 +98,19 @@
 
         // Init when IP data is available
         function initBids() {
-            if (ipLoaded === false) {
+            if (userIpLoaded === false) {
                 window.setTimeout(initBids, 50);
             } else {
                 for (let i = 0; i < adUnits.length; i++) {
                     for (let t = 0; t < adUnits[i].bids.length; t++) {
-                        adUnits[i].bids[t].params.ip = ip;
+                        adUnits[i].bids[t].params.userIp = userIp;
                     }
                 }
 
                 pbjs.que.push(function () {
                     pbjs.addAdUnits(adUnits);
                     pbjs.requestBids({
-                        timeout: timeout,
+                        timeout: PREBID_TIMEOUT,
                         bidsBackHandler: function () {
                             let iframe = document.getElementById('postbid_iframe');
                             let iframeDoc = iframe.contentWindow.document;
