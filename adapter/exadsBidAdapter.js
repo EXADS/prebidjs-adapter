@@ -140,7 +140,7 @@ function handleResRTB_2_4(serverResponse, request) {
     let bidResponses = [];
 
     if (serverResponse.hasOwnProperty('body') && serverResponse.body.hasOwnProperty('id')) {
-        utils.logInfo('ENTRO server response', serverResponse.body.id);
+        utils.logInfo('Ad server response', serverResponse.body.id);
         utils.logInfo('serverResponse.body.seatbid[0].bid[0]', serverResponse.body.seatbid[0].bid[0]);
 
         const bidRq = JSON.parse(request.data);
@@ -218,7 +218,7 @@ function handleResRTB_2_4(serverResponse, request) {
 
         bidResponses.push(bidResponse);
     } else {
-        utils.logInfo('NO ENTRO server response ->', serverResponse.body.id);
+        utils.logInfo('NO Ad server response ->', serverResponse.body.id);
     }
 
     utils.logInfo('interpretResponse -> bidResponses:', bidResponses);
