@@ -17,7 +17,8 @@ const envParams = {
 const adPartnerHandlers = {
     [BIDDER_CODES.RTB_2_4]: {
         request: handleReqRTB_2_4,
-        response: handleResRTB_2_4
+        response: handleResRTB_2_4,
+        validation:  handleValidRTB_2_4,
     }
 };
 
@@ -277,12 +278,49 @@ const imps = new Map();;
 
 manageEnvParams();
 
+function handleValidRTB_2_4(bid) {
+    const bannerInfo = bid.mediaTypes.banner;
+    const nativeInfo = bid.mediaTypes.native;
+    const videoInfo = bid.mediaTypes.video;
+
+    return !!(
+        bid.params.endpoint &&
+        bid.params.userIp && 
+        bid.params.zoneId && 
+        bid.params.fid && 
+        bid.params.siteId &&
+        bid.params.impressionId &&
+        bid.params.country &&
+        bid.params.country.length > 0 &&
+        bannerInfo || nativeInfo || videoInfo &&
+        (bannerInfo || nativeInfo ? !!(bid.params.bidfloor && bid.params.bidfloorcur) : true) &&
+        (nativeInfo ? !!(bid.params.native && 
+            bid.params.native.ver && 
+            bid.params.native.plcmttype &&
+            bid.params.native.plcmtcnt &&
+            bid.params.native.context &&
+            bid.params.native.contextsubtype) : true) &&
+        (videoInfo ? !!(bid.params.stream && 
+            bid.params.stream.video && 
+            bid.params.stream.video.mimes && 
+            bid.params.stream.video.mimes.length > 0 && 
+            bid.params.stream.protocols &&
+            bid.params.stream.protocols.length > 0) : true));
+}
+
 export const spec = {
     aliases: ['exads'], // short code
     supportedMediaTypes: [BANNER, NATIVE, VIDEO],
     isBidRequestValid: function (bid) {
         utils.logInfo('on isBidRequestValid -> bid:', bid);
-        return !!(bid.params.userIp && bid.params.zoneId && bid.params.fid);
+        let adPartner = bid.bidder;
+
+        if (adPartnerHandlers[adPartner]['validation']) {
+            return adPartnerHandlers[adPartner]['validation'](bid);
+        } else {
+            // Handle unknown or unsupported ad partners
+            return false;
+        }
     },
     buildRequests: function (validBidRequests, bidderRequest) {
         utils.logInfo('on buildRequests -> validBidRequests:', validBidRequests);
