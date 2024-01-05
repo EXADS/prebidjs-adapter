@@ -11,7 +11,8 @@ const envParams = {
   userAgent: '',
   osName: '',
   page: '',
-  domain: ''
+  domain: '',
+  language: ''
 };
 
 const adPartnerHandlers = {
@@ -47,9 +48,7 @@ function handleReqRTB2Dot4(bid, endpointUrl, validBidRequests, bidderRequest) {
       'os': envParams.osName,
       'js': 0,
       'ext': {
-        'remote_addr': '',
-        'x_forwarded_for': '',
-        'accept_language': 'en-GB'
+        'accept_language': envParams.language
       }
     },
     'user': {
@@ -63,26 +62,40 @@ function handleReqRTB2Dot4(bid, endpointUrl, validBidRequests, bidderRequest) {
   // Banner setup
   const bannerMediaType = utils.deepAccess(bid, 'mediaTypes.banner');
   if (bannerMediaType != null) {
-    bidRequestData.imp = bannerMediaType.sizes.map(size => ({
-      'id': bid.params.impressionId,
-      'bidfloor': bid.params.bidfloor,
-      'bidfloorcur': bid.params.bidfloorcur,
-      'banner': {
-        'w': size[0],
-        'h': size[1]
+    bidRequestData.imp = bannerMediaType.sizes.map(size => {
+      let ext = undefined;
+
+      if (bid.params.image_output ||
+        bid.params.video_output) {
+        ext = {
+          image_output: bid.params.image_output ? bid.params.image_output : undefined,
+          video_output: bid.params.video_output ? bid.params.video_output : undefined,
+        }
       }
-    })
+
+      return ({
+        'id': bid.params.impressionId,
+        'bidfloor': bid.params.bidfloor,
+        'bidfloorcur': bid.params.bidfloorcur,
+        'banner': {
+          'w': size[0],
+          'h': size[1],
+          'mimes': bid.params.mimes ? bid.params.mimes : undefined,
+          ext
+        },
+      })
+    } 
     );
   }
   const nativeMediaType = utils.deepAccess(bid, 'mediaTypes.native');
 
   if (nativeMediaType != null) {
+    const nativeVersion = '1.2';
+
     const native = {
       'native': {
-        'ver': bid.params.native.ver,
-        'context': bid.params.native.context,
-        'contextsubtype': bid.params.native.contextsubtype,
-        'plcmttype': bid.params.native.plcmttype,
+        'ver': nativeVersion,
+        'plcmttype': 4,
         'plcmtcnt': bid.params.native.plcmtcnt
       }
     };
@@ -102,7 +115,7 @@ function handleReqRTB2Dot4(bid, endpointUrl, validBidRequests, bidderRequest) {
       'bidfloorcur': bid.params.bidfloorcur,
       'native': {
         'request': JSON.stringify(native),
-        'ver': bid.params.native.ver
+        'ver': nativeVersion
       },
     }];
 
@@ -144,6 +157,7 @@ function handleResRTB2Dot4(serverResponse, request) {
     const bidRq = JSON.parse(request.data);
     const requestId = serverResponse.body.id;
     const bidData = serverResponse.body.seatbid[0].bid[0];
+    const currency = serverResponse.body.cur;
     let bidResponseAd = bidData.adm;
     let pixelUrl = bidData.nurl.replace(/^http:\/\//i, 'https://');
     let pixelImage = '<img width="1" height="1" border="0" src="' + pixelUrl + '" />';
@@ -187,9 +201,9 @@ function handleResRTB2Dot4(serverResponse, request) {
 
     const bidResponse = {
       requestId: requestId,
-      currency: 'USD',
-      ad: bidResponseAd,
-      cpm: 1.50,
+      currency: currency,
+      ad: bidData.adm,
+      cpm: bidData.price,
       creativeId: bidData.crid,
       cid: bidData.cid,
       width: w,
@@ -200,7 +214,7 @@ function handleResRTB2Dot4(serverResponse, request) {
     };
 
     if (mediaType == 'native') {
-      native.clickUrl = pixelUrl;
+      native.clickUrl = bidData.adomain[0];
       bidResponse.native = native;
     }
 
@@ -262,11 +276,19 @@ function manageEnvParams() {
     envParams.osName = 'Linux';
   }
 
+  let browserLanguage = navigator.language || navigator.userLanguage;
+  //let primaryLanguage = browserLanguage.split("-")[0];
+  //let acceptLanguage = primaryLanguage + '-' + primaryLanguage.toUpperCase();
+  let acceptLanguage = browserLanguage.replace('_', '-');
+
+  envParams.language = acceptLanguage;
+
   utils.logInfo('Domain -> ', envParams.domain);
   utils.logInfo('Page -> ', envParams.page);
   utils.logInfo('Lang -> ', envParams.lang);
   utils.logInfo('OS -> ', envParams.osName);
   utils.logInfo('User Agent -> ', envParams.userAgent);
+  utils.logInfo('Primary Language -> ', envParams.language);
 }
 
 export const imps = new Map();
@@ -290,11 +312,7 @@ function handleValidRTB2Dot4(bid) {
         (bannerInfo || nativeInfo || videoInfo) &&
         (bannerInfo || nativeInfo ? !!(bid.params.bidfloor && bid.params.bidfloorcur) : true) &&
         (nativeInfo ? !!(bid.params.native &&
-            bid.params.native.ver &&
-            bid.params.native.plcmttype &&
-            bid.params.native.plcmtcnt &&
-            bid.params.native.context &&
-            bid.params.native.contextsubtype) : true) &&
+            bid.params.native.plcmtcnt) : true) &&
         (videoInfo ? !!(bid.params.stream &&
             bid.params.stream.video &&
             bid.params.stream.video.mimes &&
@@ -305,7 +323,7 @@ function handleValidRTB2Dot4(bid) {
 
 export const spec = {
   aliases: ['exads'], // short code
-  
+
   supportedMediaTypes: [BANNER, NATIVE, VIDEO],
   isBidRequestValid: function (bid) {
     utils.logInfo('on isBidRequestValid -> bid:', bid);
