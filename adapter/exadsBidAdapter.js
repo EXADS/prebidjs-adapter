@@ -128,9 +128,9 @@ function handleReqRTB2Dot4(bid, endpointUrl, validBidRequests, bidderRequest) {
     const imp = [{
       'id': bid.params.impressionId,
       'video': {
-        'mimes': bid.params.stream.video.mimes
+        'mimes': bid.params.stream.video.mimes,
+        'protocols': bid.params.stream.protocols,
       },
-      'protocols': bid.params.stream.protocols,
       'ext': bid.params.stream.ext
     }];
 
@@ -211,6 +211,7 @@ function handleResRTB2Dot4(serverResponse, request) {
       height: h,
       netRevenue: true,
       mediaType: mediaType,
+      nurl: pixelUrl
     };
 
     if (mediaType == 'native') {
@@ -380,6 +381,9 @@ export const spec = {
   },
   onBidWon: function (bid) {
     utils.logInfo(`onBidWon -> bid:`, bid);
+    if (bid['nurl']) {
+      utils.triggerPixel(bid['nurl']);
+    }
   },
   onSetTargeting: function (bid) {
     utils.logInfo(`onSetTargeting -> bid:`, bid);
