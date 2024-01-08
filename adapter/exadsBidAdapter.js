@@ -63,7 +63,7 @@ function handleReqRTB2Dot4(bid, endpointUrl, validBidRequests, bidderRequest) {
   const bannerMediaType = utils.deepAccess(bid, 'mediaTypes.banner');
   if (bannerMediaType != null) {
     bidRequestData.imp = bannerMediaType.sizes.map(size => {
-      let ext = undefined;
+      let ext;
 
       if (bid.params.image_output ||
         bid.params.video_output) {
@@ -84,7 +84,7 @@ function handleReqRTB2Dot4(bid, endpointUrl, validBidRequests, bidderRequest) {
           ext
         },
       })
-    } 
+    }
     );
   }
   const nativeMediaType = utils.deepAccess(bid, 'mediaTypes.native');
@@ -219,7 +219,7 @@ function handleResRTB2Dot4(serverResponse, request) {
     }
 
     if (mediaType == 'video') {
-      bidResponse.vastUrl = pixelUrl;
+      bidResponse.vastXml = bidData.adm;
       bidResponse.width = bidData.w;
       bidResponse.height = bidData.h;
     }
@@ -277,8 +277,8 @@ function manageEnvParams() {
   }
 
   let browserLanguage = navigator.language || navigator.userLanguage;
-  //let primaryLanguage = browserLanguage.split("-")[0];
-  //let acceptLanguage = primaryLanguage + '-' + primaryLanguage.toUpperCase();
+  // let primaryLanguage = browserLanguage.split("-")[0];
+  // let acceptLanguage = primaryLanguage + '-' + primaryLanguage.toUpperCase();
   let acceptLanguage = browserLanguage.replace('_', '-');
 
   envParams.language = acceptLanguage;
