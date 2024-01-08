@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Prebid.js Article1</title>
 
     <script src="js/prebid.js"></script>
+    <!-- Fluid Player CSS and JS -->
+    <script src="https://cdn.fluidplayer.com/v3/current/fluidplayer.min.js"></script>
     <script>
         // Client Conf start
         //http://rtb.exads.rocks/rtb.php?idzone=5102563&fid=e14da4477edb2effaedd1e2f56501f1151f588fc
@@ -28,13 +31,14 @@
         ip_script.type = "text/javascript";
         ip_script.src = "https://api.ipify.org?format=jsonp&callback=userIpCallback";
         document.getElementsByTagName('head')[0].appendChild(ip_script);
-  
+
         var pbjs = pbjs || {};
         pbjs.que = pbjs.que || [];
 
         // TODO: COMMENT
         pbjs.setConfig({
-            debug: true
+            debug: true,
+            cache: { url: "https://prebid.adnxs.com/pbc/v1/cache" }
         });
 
         handleRTB();
@@ -56,20 +60,21 @@
             h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
             return 4294967296 * (2097151 & h2) + (h1 >>> 0);
         }
-        
+
         function handleRTB() {
             adUnits = [{
-            code: 'postbid_iframe',
-            mediaTypes: {
-                video: {
-                    mimes: ['video/mp4'],
-                    context: 'instream', // or 'outstream'
-                    protocols: [3,6]
-                }
-            },
-            bids: [{
-                bidder: 'exadsadserver_rtb_2_4',
-                params: {
+                code: 'postbid_iframe',
+                mediaTypes: {
+                    video: {
+                        mimes: ['video/mp4'],
+                        context: 'instream', // or 'outstream'
+                        protocols: [3, 6],
+                        divId: 'player', // required to indicate which player is being used to render this ad unit.
+                    }
+                },
+                bids: [{
+                    bidder: 'exadsadserver_rtb_2_4',
+                    params: {
                         zoneId: zoneId,
                         fid: fid,
                         siteId: siteId,
@@ -111,24 +116,44 @@
                     pbjs.addAdUnits(adUnits);
                     pbjs.requestBids({
                         timeout: PREBID_TIMEOUT,
-                        bidsBackHandler: function () {
-                            let iframe = document.getElementById('postbid_iframe');
-                            let iframeDoc = iframe.contentWindow.document;
-                            let adServerTargeting = pbjs.getAdserverTargetingForAdUnitCode('postbid_iframe');
-
-                            // If any bidders return any creatives
-                            if (adServerTargeting && adServerTargeting['hb_adid']) {
-                                pbjs.renderAd(iframeDoc, adServerTargeting['hb_adid']);
-                            } else {
-                                iframe.width = bannerSizes[0][0];
-                                iframe.height = bannerSizes[0][1];
-                                iframeDoc.write('<head></head><body>' + passbackTagHtml + '</body>');
-                                iframeDoc.close();
+                        bidsBackHandler: function (bidResponses) {
+                            const bidResponse = bidResponses['postbid_iframe'];
+                            if (!bidResponse) {
+                                return;
                             }
+
+                            bidResponse.bids.forEach(bid => {
+                                initFluidPlayer(bid.vastUrl);
+
+                            });
                         }
                     });
-                });
+                })
             }
+        }
+
+
+        function initFluidPlayer(vastUrl) {
+            var fluidPlayerInstance = fluidPlayer('video-element', {
+                vastOptions: {
+                    adList: [
+                        {
+                            roll: 'preRoll',
+                            vastTag: vastUrl,
+                            adText: 'Advertising supports us directly'
+                        },],
+
+                    skipButtonCaption: 'Skip ad in [5]',
+                    skipButtonClickCaption: 'Skip ad <span class="skip_button_icon"></span>',
+                    adText: null,
+                    adTextPosition: 'top left',
+                    adCTAText: 'Visit now!',
+                    adCTATextPosition: 'bottom right',
+                    vastTimeout: 5000,
+                    showPlayButton: false,
+                    maxAllowedVastTagRedirects: 1,
+                }
+            });
         }
 
         initBids();
@@ -136,16 +161,25 @@
         // Define the passback HTML tag here.
         // Note that this tag is usually in either Script tag form or iFrame form.
         let passbackTagHtml = '<iframe src="//a.adnflow.com/iframe.php?idzone=88&size=300x250" width="300" height="250" scrolling="no" marginwidth="0" marginheight="0" frameborder="0"></iframe>';
-        
+
     </script>
 
 </head>
+
 <body>
+
+    <script>
+
+    </script>
 
     <h2>Prebid.js Example</h2>
     <h5>Div-1</h5>
 
-    <iframe id='postbid_iframe' frameborder="0" scrolling="no" marginheight="0" marginwidth="0" topmargin="0" leftmargin="0" allowtransparency="true" width="0" height="0"></iframe>
+    <!-- Your main video element -->
+    <video id="video-element">
+        <source src="https://vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
+    </video>
 
 </body>
+
 </html>
