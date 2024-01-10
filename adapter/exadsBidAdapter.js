@@ -12,7 +12,8 @@ const envParams = {
   osName: '',
   page: '',
   domain: '',
-  language: ''
+  language: '',
+  userId: ''
 };
 
 const adPartnerHandlers = {
@@ -52,7 +53,7 @@ function handleReqRTB2Dot4(bid, endpointUrl, validBidRequests, bidderRequest) {
       }
     },
     'user': {
-      'id': ''
+      'id': bid.params.userId
     },
     'ext': {
       'sub': 0
@@ -284,6 +285,8 @@ function manageEnvParams() {
 
   envParams.language = acceptLanguage;
 
+  console.log(navigator.ip);
+
   utils.logInfo('Domain -> ', envParams.domain);
   utils.logInfo('Page -> ', envParams.page);
   utils.logInfo('Lang -> ', envParams.lang);
@@ -304,6 +307,7 @@ function handleValidRTB2Dot4(bid) {
   return !!(
     bid.params.endpoint &&
         bid.params.userIp &&
+        bid.params.userId &&
         bid.params.zoneId &&
         bid.params.fid &&
         bid.params.siteId &&

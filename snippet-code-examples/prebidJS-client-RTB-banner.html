@@ -23,6 +23,12 @@
         let userIp = 0;
         let userIpLoaded = false;
         let impression_id = hashCode(new Date().getTime().toString());
+        let user_id = localStorage.getItem('prebidJS.user_id');
+        
+        if(!user_id) {
+            localStorage.setItem('prebidJS.user_id', hashCode('user_id' + new Date().getTime().toString()));
+            user_id =  localStorage.getItem('prebidJS.user_id');
+        }
 
         let ip_script = document.createElement("script");
         ip_script.type = "text/javascript";
@@ -73,6 +79,7 @@
                         siteId: siteId,
                         catIab: catIab,
                         userIp: 0,
+                        userId: user_id,
                         country: 'ITA',
                         impressionId: impression_id.toString(),
                         keywords: 'lifestyle, humour',

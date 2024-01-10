@@ -25,6 +25,12 @@
         let userIp = 0;
         let userIpLoaded = false;
         let impression_id = hashCode(new Date().getTime().toString());
+        let user_id = localStorage.getItem('prebidJS.user_id');
+        
+        if(!user_id) {
+            localStorage.setItem('prebidJS.user_id', hashCode('user_id' + new Date().getTime().toString()));
+            user_id =  localStorage.getItem('prebidJS.user_id');
+        }
 
         let ip_script = document.createElement("script");
         ip_script.type = "text/javascript";
@@ -38,7 +44,7 @@
             debug: true
         });
         
-        pbjs.renderAd=function(iframeDoc, data){
+        pbjs.renderAd = function(iframeDoc, data){
             let template = "<div class=\"sponsored-post\"><div class=\"thumbnail\"><\/div><div class=\"content\"><h1>##hb_native_title##<\/h1><p>##hb_native_body##<\/p><a href=\"https:\/\/##hb_native_linkurl##\" target=\"_blank\"><img src=\"##hb_native_image##\"><\/a><div class=\"content\"> <\/div> <\/div>";
             let keys = Object.keys(data);
             for (var i = 0; i < keys.length; i++){
@@ -111,6 +117,7 @@
                         catIab: catIab,
                         keywords: 'lifestyle, humour',
                         userIp: 0, // DO NOT EDIT - Client side data
+                        userId: user_id,
                         impressionId: impression_id.toString(), // DO NOT EDIT - Custom hash,
                         native: {
                             plcmtcnt: 4,

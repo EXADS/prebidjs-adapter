@@ -31,6 +31,7 @@ adUnits = [{
                 siteId: siteId,
                 catIab: catIab,
                 userIp: 0,
+                userId: 0,
                 country: 'IRL',
                 impressionId: impression_id.toString(),
                 keywords: 'lifestyle, humour',
@@ -64,6 +65,7 @@ RTB Banner (Video)
                 siteId: siteId,
                 catIab: catIab,
                 userIp: 0,
+                userId: 0,
                 country: 'ITA',
                 impressionId: impression_id.toString(),
                 keywords: 'lifestyle, humour',
@@ -98,6 +100,7 @@ RTB Video (Instream/OutStream/Video Slider) - VAST XML or VAST TAG (url)
             fid: fid,
             siteId: siteId,
             userIp: 0, // DO NOT EDIT - Client side data
+            userId: 0,
             impressionId: impression_id.toString(), // DO NOT EDIT - Custom hash
             stream: {
                 video: {
@@ -164,6 +167,7 @@ adUnits = [{
                 catIab: catIab,
                 keywords: 'lifestyle, humour',
                 userIp: 0, // DO NOT EDIT - Client side data
+                userId: 0,
                 impressionId: impression_id.toString(), // DO NOT EDIT - Custom hash,
                 native: {
                     plcmtcnt: 4,
