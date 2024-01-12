@@ -8,7 +8,7 @@ Exads PrebidJS Adapter
 * Updating the unit tests, they are into ./Prebid.js/test/spec/modules
 * Running tlint and unit tests (to see the specific paragraph)
 * Doing manual tests (to see the specific paragraph)
-* Merging the new version of the adapter with prebidJS library running `gulp build-bundle-dev`
+* Merging the new version of the adapter with prebidJS library running `gulp build-bundle-dev-copy  --modules=consentManagement,exadsBidAdapter`
 * After that we can use the resulting prebidJS adapter. You can find it into `./build/dev/prebid.js`
 * Updating the snippet code. You can find it into this repository: ./snippet-code-examples
 

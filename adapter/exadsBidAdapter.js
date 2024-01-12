@@ -26,6 +26,7 @@ const adPartnerHandlers = {
 
 function handleReqRTB2Dot4(bid, endpointUrl, validBidRequests, bidderRequest) {
   utils.logInfo(`Calling endpoint for rtb_2_4:`, endpointUrl);
+  const gdprConsent = getGdprConsentChoice(bidderRequest);
 
   // Make a dynamic bid request to the ad partner's endpoint
   let bidRequestData = {
@@ -53,12 +54,18 @@ function handleReqRTB2Dot4(bid, endpointUrl, validBidRequests, bidderRequest) {
       }
     },
     'user': {
-      'id': bid.params.userId
+      'id': bid.params.userId,
     },
     'ext': {
       'sub': 0
     }
   };
+
+  if(gdprConsent.gdprApplies) {
+    bidRequestData.user['ext'] = {
+      consent: gdprConsent.consentString
+    }
+  }
 
   // Banner setup
   const bannerMediaType = utils.deepAccess(bid, 'mediaTypes.banner');
@@ -324,6 +331,29 @@ function handleValidRTB2Dot4(bid) {
             bid.params.stream.video.mimes.length > 0 &&
             bid.params.stream.protocols &&
             bid.params.stream.protocols.length > 0) : true));
+}
+
+function hasValue(value) {
+  return (
+    value !== undefined &&
+    value !== null
+  )
+}
+
+function getGdprConsentChoice(bidderRequest) {
+  const hasGdprConsent =
+    hasValue(bidderRequest) &&
+    hasValue(bidderRequest.gdprConsent);
+
+  if (hasGdprConsent) {
+    return bidderRequest.gdprConsent;
+  }
+
+  return {
+    consentString: '',
+    vendorData: {},
+    gdprApplies: false,
+  }
 }
 
 export const spec = {
