@@ -4,6 +4,27 @@ Exads PrebidJS Adapter
 #### In order to mantain the adapter locally:
 
 * Cloning locally the official prebidJS repository: https://github.com/prebid/Prebid.js.git
+* Adding these new lines (change the paths accordly to your needs): 
+```
+function copyFiles(dev) {
+  if(dev) {
+    return gulp.src('build/dev/prebid.js')
+      .pipe(gulp.dest('../../../../sys-vagrocker/code/management/js/'));
+  } else {
+    return gulp.src('build/dist/prebid.js')
+      .pipe(gulp.dest('../../../../sys-vagrocker/code/management/js/'));    
+  }
+}
+
+gulp.task('build-with-adapter-dev', gulp.series(makeDevpackPkg, gulpBundle.bind(null, true), copyFiles.bind(null, true)));
+gulp.task('build-with-adapter-prod', gulp.series(makeDevpackPkg, gulpBundle.bind(null, false), copyFiles.bind(null, false)));
+```
+
+in the end of gulpfile.js before the last line
+```
+module.exports = nodeBundle;
+```
+
 * Changing the adapter that you can find into ./Prebid.js/modules (if it was already deployed into the official prebidJS repository)
 * Updating the unit tests, they are into ./Prebid.js/test/spec/modules
 * Running tlint and unit tests (to see the specific paragraph)
