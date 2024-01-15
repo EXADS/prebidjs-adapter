@@ -2,23 +2,41 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Prebid.js Article1</title>
-
-    <script src="js/prebid.js"></script>
+    <title>RTB Banner Prebid.js</title>
+    <!-- Uncomment for development environments -->
+    <!-- <script src="js/prebid.js"></script> -->
+    <!-- Uncomment for production environments -->
+    <script async src="js/prebid.js" onload="onScriptLoaded()"></script>
     <script>
+        
         // Client Conf start
-        //http://rtb.exads.rocks/rtb.php?idzone=5102563&fid=e14da4477edb2effaedd1e2f56501f1151f588fc
+        // Set as true for development environments only
+        const isEnabledDebug = false;
+        const exads_endpoint = 'https://rtb.exads.rocks/rtb.php';
         let zoneId = 5147485;
         let fid = "829a896f011475d505a0d89cfdd1af8d9cdb07ff";
+
+        // Start GDPR params
+        let isGDPRRequested = false;
+        // Valid iabtcf consent string 
+        let consentString = 'CO_V33gP0l1PgAoAAAENCZCgAAAAAAAAAAAAE0wAQE0gTTABATSAAA.YAAAAAAAAAA';
+        // End GDPR params
+
         let siteId = "12345";
         let bannerSizes = [
             [300, 250]
         ];
+        let country = 'IRL';
+        let keywords = 'lifestyle, humour';
         let catIab = ['IAB25-3']; // if available - ex.: ["IAB1-5", "IAB1-7"]
-        const exads_endpoint = 'https://rtb.exads.rocks/rtb.php';
-        let adUnits = [];
+        let bidfloorcur = 'EUR';
+        let bidfloor = 0.00000011;
+        let mimes = ['image/jpg'];
+        let imageOutput = "html";
+        let videoOutput = "html";
         // Client Conf end
 
+        let adUnits = [];
         let PREBID_TIMEOUT = 5000;
         let userIp = 0;
         let userIpLoaded = false;
@@ -38,12 +56,35 @@
         var pbjs = pbjs || {};
         pbjs.que = pbjs.que || [];
 
-        // TODO: COMMENT
-        pbjs.setConfig({
-            debug: true
-        });
+        // Uncomment if you have to debug and set script tag that import prebidJS library as not async)
+        /*pbjs.setConfig({
+            debug: true,
+        });*/
 
         handleRTB();
+
+        if(isEnabledDebug) {
+            onScriptLoaded();
+        }
+
+        function onScriptLoaded() {
+            pbjs.setConfig({
+                debug: isEnabledDebug,
+                consentManagement: {
+                    gdpr: {
+                        cmpApi: 'static',
+                        timeout: 1000000,
+                        defaultGdprScope: true,
+                        consentData: {
+                            getTCData: {
+                                tcString: consentString,
+                                gdprApplies: isGDPRRequested
+                            }
+                        }
+                    }
+                }
+            });
+        }
 
         // ======== DO NOT EDIT BELOW THIS LINE =========== //
         function userIpCallback(user_ip) {
@@ -51,6 +92,7 @@
             if (user_ip.hasOwnProperty('ip')) userIp = user_ip.ip;
         }
 
+        // MurmurHash3 hash function
         function hashCode(str, seed = 0) {
             let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
             for (let i = 0, ch; i < str.length; i++) {
@@ -80,14 +122,14 @@
                         catIab: catIab,
                         userIp: 0,
                         userId: user_id,
-                        country: 'ITA',
+                        country: country,
                         impressionId: impression_id.toString(),
-                        keywords: 'lifestyle, humour',
-                        bidfloor: 0.00000011,
-                        bidfloorcur: 'EUR',
-                        mimes: ['image/jpg'],
-                        image_output: "html",
-                        video_output: "html",
+                        keywords: keywords,
+                        bidfloor: bidfloor,
+                        bidfloorcur: bidfloorcur,
+                        mimes: mimes,
+                        image_output: imageOutput,
+                        video_output: videoOutput,
                         endpoint: exads_endpoint
                     }
                 }]
@@ -140,7 +182,7 @@
 </head>
 <body>
 
-    <h2>Prebid.js Example</h2>
+    <h2>RTB Banner Prebid.js</h2>
 
     <iframe id='postbid_iframe' frameborder="0" scrolling="no" marginheight="0" marginwidth="0" topmargin="0" leftmargin="0" allowtransparency="true" width="0" height="0"></iframe>
 

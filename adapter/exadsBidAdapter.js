@@ -61,7 +61,7 @@ function handleReqRTB2Dot4(bid, endpointUrl, validBidRequests, bidderRequest) {
     }
   };
 
-  if(gdprConsent.gdprApplies) {
+  if(gdprConsent && gdprConsent.gdprApplies) {
     bidRequestData.user['ext'] = {
       consent: gdprConsent.consentString
     }
@@ -168,7 +168,6 @@ function handleResRTB2Dot4(serverResponse, request) {
     const currency = serverResponse.body.cur;
     let bidResponseAd = bidData.adm;
     let pixelUrl = bidData.nurl.replace(/^http:\/\//i, 'https://');
-    let pixelImage = '<img width="1" height="1" border="0" src="' + pixelUrl + '" />';
 
     const bannerInfo = utils.deepAccess(bidRq.imp[0], 'banner');
     const nativeInfo = utils.deepAccess(bidRq.imp[0], 'native');
@@ -179,7 +178,6 @@ function handleResRTB2Dot4(serverResponse, request) {
     const native = {};
 
     if (bannerInfo != null) {
-      bidResponseAd = bidResponseAd + pixelImage;
       w = bidRq.imp[0].banner.w;
       h = bidRq.imp[0].banner.h;
       mediaType = BANNER;
@@ -258,7 +256,6 @@ function makeBidRequest(url, data) {
 function getUrl(adPartner, bid) {
   let endpointUrlMapping = {
     [BIDDER_CODES.RTB_2_4]: bid.params.endpoint + '?idzone=' + bid.params.zoneId + '&fid=' + bid.params.fid
-    // Add more mappings as needed
   };
 
   return endpointUrlMapping[adPartner] ? endpointUrlMapping[adPartner] : 'defaultEndpoint';
@@ -286,13 +283,9 @@ function manageEnvParams() {
   }
 
   let browserLanguage = navigator.language || navigator.userLanguage;
-  // let primaryLanguage = browserLanguage.split("-")[0];
-  // let acceptLanguage = primaryLanguage + '-' + primaryLanguage.toUpperCase();
   let acceptLanguage = browserLanguage.replace('_', '-');
 
   envParams.language = acceptLanguage;
-
-  console.log(navigator.ip);
 
   utils.logInfo('Domain -> ', envParams.domain);
   utils.logInfo('Page -> ', envParams.page);
@@ -337,7 +330,7 @@ function hasValue(value) {
   return (
     value !== undefined &&
     value !== null
-  )
+  );
 }
 
 function getGdprConsentChoice(bidderRequest) {
@@ -349,11 +342,7 @@ function getGdprConsentChoice(bidderRequest) {
     return bidderRequest.gdprConsent;
   }
 
-  return {
-    consentString: '',
-    vendorData: {},
-    gdprApplies: false,
-  }
+  return null;
 }
 
 export const spec = {

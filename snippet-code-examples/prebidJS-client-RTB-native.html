@@ -3,23 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <title>Prebid.js</title>
-    <!-- TODO: uncomment -->
-    <!-- <script async src="js/prebid.js"></script> -->
-    <!-- TODO: comment -->
-    <script src="js/prebid.js"></script>
+    <!-- Uncomment for development environments -->
+    <!-- <script src="js/prebid.js"></script> -->
+    <!-- Uncomment for production environments -->
+    <script async src="js/prebid.js" onload="onScriptLoaded()"></script>
     <script>
         // Client Conf start
-        //http://rtb.exads.rocks/rtb.php?idzone=5102563&fid=e14da4477edb2effaedd1e2f56501f1151f588fc
+        // Set as true for development environments only
+        const isEnabledDebug = false;
+        const exads_endpoint = 'https://rtb.exads.rocks/rtb.php';
         let zoneId = 5147487;
         let fid = "4695aca948cc0207bf78099f282b0f98fa3d98bc";
+
+        // Start GDPR params
+        let isGDPRRequested = false;
+        // Valid iabtcf consent string 
+        let consentString = 'CO_V33gP0l1PgAoAAAENCZCgAAAAAAAAAAAAE0wAQE0gTTABATSAAA.YAAAAAAAAAA';
+        // End GDPR params
+
         let siteId = "12345";
         let bannerSizes = [
             [300, 250]
         ];
+        let country = 'IRL';
+        let keywords = 'lifestyle, humour';
         let catIab = ['IAB25-3']; // if available - ex.: ["IAB1-5", "IAB1-7"]
-        const exads_endpoint = 'https://rtb.exads.rocks/rtb.php';
-        let adUnits = [];
+        let bidfloorcur = 'EUR';
+        let bidfloor = 0.00000011;
+        // Set the assets section parameters
+        // If you need change the rendering function
         // Client Conf end
+
+        let adUnits = [];
 
         let PREBID_TIMEOUT = 5000;
         let userIp = 0;
@@ -39,23 +54,44 @@
 
         var pbjs = pbjs || {};
         pbjs.que = pbjs.que || [];
-        // TODO: COMMENT
-        pbjs.setConfig({
-            debug: true
-        });
         
-        pbjs.renderAd = function(iframeDoc, data){
-            let template = "<div class=\"sponsored-post\"><div class=\"thumbnail\"><\/div><div class=\"content\"><h1>##hb_native_title##<\/h1><p>##hb_native_body##<\/p><a href=\"https:\/\/##hb_native_linkurl##\" target=\"_blank\"><img src=\"##hb_native_image##\"><\/a><div class=\"content\"> <\/div> <\/div>";
-            let keys = Object.keys(data);
-            for (var i = 0; i < keys.length; i++){
-                template = template.replace("##"+keys[i]+"##",data[keys[i]]);
-            }
-            iframeDoc.open();
-            iframeDoc.write(template);
-            iframeDoc.close();
-        }
 
         handleRTB();
+
+        if(isEnabledDebug) {
+            onScriptLoaded();
+        }
+
+        function onScriptLoaded() {
+            pbjs.setConfig({
+                debug: isEnabledDebug,
+                consentManagement: {
+                    gdpr: {
+                        cmpApi: 'static',
+                        timeout: 1000000,
+                        defaultGdprScope: true,
+                        consentData: {
+                            getTCData: {
+                                tcString: consentString,
+                                gdprApplies: isGDPRRequested
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // overriding rendering function based on own needs
+            pbjs.renderAd = function(iframeDoc, data){
+                let template = "<div><div><\/div><div><h1>##hb_native_title##<\/h1><p>##hb_native_body##<\/p><a href=\"https:\/\/##hb_native_linkurl##\" target=\"_blank\"><img src=\"##hb_native_image##\"><\/a><div> <\/div> <\/div>";
+                let keys = Object.keys(data);
+                for (var i = 0; i < keys.length; i++){
+                    template = template.replace("##"+keys[i]+"##",data[keys[i]]);
+                }
+                iframeDoc.open();
+                iframeDoc.write(template);
+                iframeDoc.close();
+            }
+        }
 
         // ======== DO NOT EDIT BELOW THIS LINE =========== //
         function userIpCallback(user_ip) {
@@ -115,16 +151,16 @@
                         fid: fid,
                         siteId: siteId,
                         catIab: catIab,
-                        keywords: 'lifestyle, humour',
+                        keywords: keywords,
                         userIp: 0, // DO NOT EDIT - Client side data
                         userId: user_id,
                         impressionId: impression_id.toString(), // DO NOT EDIT - Custom hash,
                         native: {
                             plcmtcnt: 4,
                         },
-                        bidfloor: 0.00000011,
-                        bidfloorcur: 'EUR',
-                        country: 'ITA',
+                        bidfloor: bidfloor,
+                        bidfloorcur: bidfloorcur,
+                        country: country,
                         endpoint: exads_endpoint
                     }
                 }]
@@ -176,7 +212,7 @@
 
 </head>
 <body>
-
+    <h2>RTB Native Prebid.js</h2>
     <iframe id='postbid_iframe' frameborder="0" scrolling="no" marginheight="0" marginwidth="0" topmargin="0" leftmargin="0" allowtransparency="true" width="500" height="500"></iframe>
 </body>
 </html>
