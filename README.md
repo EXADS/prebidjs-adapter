@@ -33,9 +33,12 @@ module.exports = nodeBundle;
 * Merging the new version of the adapter with prebidJS library running 
 * `build-with-adapter-dev  --modules=consentManagement,exadsBidAdapter` for development environments
 * `build-with-adapter-prod  --modules=consentManagement,exadsBidAdapter` for production environments
-* After that we can use the resulting prebidJS adapter. You can find it into 
+* After that you can use the resulting prebidJS adapter. 
+* You can find it into: 
 * `./build/dev/prebid.js` if you have runned `build-with-adapter-dev`
 * `./build/dist/prebid.js` if you have runned `build-with-adapter-prod`
+* or 
+* into the destination folder specified into the upper function, `copyFiles()`;
 * Updating the snippet code. You can find it into this repository: ./snippet-code-examples
 
 #### Lint and Unit tests
@@ -53,7 +56,7 @@ module.exports = nodeBundle;
 
 #### Environments (development and production) - Changes to do into the snippet code
 * Set isEnabledDebug global variable (If it is true, you will be able to see logs)
-* 
+
 * For development environments
 ```
     <!-- Uncomment for development environments -->
