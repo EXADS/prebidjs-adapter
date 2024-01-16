@@ -1,5 +1,5 @@
 /* prebid.js v8.24.0-pre
-Updated: 2024-01-15
+Updated: 2024-01-16
 Modules: consentManagement, exadsBidAdapter */
 
 if (!window.pbjs || !window.pbjs.libLoaded) {
@@ -14665,6 +14665,8 @@ function handleReqRTB2Dot4(bid, endpointUrl, validBidRequests, bidderRequest) {
   if (videoMediaType != null) {
     var _imp = [{
       'id': bid.params.impressionId,
+      'bidfloor': bid.params.bidfloor,
+      'bidfloorcur': bid.params.bidfloorcur,
       'video': {
         'mimes': bid.params.stream.video.mimes,
         'protocols': bid.params.stream.protocols
@@ -14809,7 +14811,7 @@ function handleValidRTB2Dot4(bid) {
   var bannerInfo = (_bid$mediaTypes = bid.mediaTypes) === null || _bid$mediaTypes === void 0 ? void 0 : _bid$mediaTypes.banner;
   var nativeInfo = (_bid$mediaTypes2 = bid.mediaTypes) === null || _bid$mediaTypes2 === void 0 ? void 0 : _bid$mediaTypes2.native;
   var videoInfo = (_bid$mediaTypes3 = bid.mediaTypes) === null || _bid$mediaTypes3 === void 0 ? void 0 : _bid$mediaTypes3.video;
-  return !!(bid.params.endpoint && bid.params.userIp && bid.params.userId && bid.params.zoneId && bid.params.fid && bid.params.siteId && bid.params.impressionId && bid.params.country && bid.params.country.length > 0 && (bannerInfo || nativeInfo || videoInfo) && (bannerInfo || nativeInfo ? !!(bid.params.bidfloor && bid.params.bidfloorcur) : true) && (nativeInfo ? !!(bid.params.native && bid.params.native.plcmtcnt) : true) && (videoInfo ? !!(bid.params.stream && bid.params.stream.video && bid.params.stream.video.mimes && bid.params.stream.video.mimes.length > 0 && bid.params.stream.protocols && bid.params.stream.protocols.length > 0) : true));
+  return !!(bid.params.endpoint && bid.params.userIp && bid.params.hasOwnProperty('userId') && bid.params.zoneId && bid.params.fid && bid.params.siteId && bid.params.impressionId && bid.params.country && bid.params.country.length > 0 && (bannerInfo || nativeInfo || videoInfo) && (bannerInfo || nativeInfo ? !!(bid.params.bidfloor && bid.params.bidfloorcur) : true) && (nativeInfo ? !!(bid.params.native && bid.params.native.plcmtcnt) : true) && (videoInfo ? !!(bid.params.stream && bid.params.stream.video && bid.params.stream.video.mimes && bid.params.stream.video.mimes.length > 0 && bid.params.stream.protocols && bid.params.stream.protocols.length > 0) : true));
 }
 function hasValue(value) {
   return value !== undefined && value !== null;

@@ -135,6 +135,8 @@ function handleReqRTB2Dot4(bid, endpointUrl, validBidRequests, bidderRequest) {
   if (videoMediaType != null) {
     const imp = [{
       'id': bid.params.impressionId,
+      'bidfloor': bid.params.bidfloor,
+      'bidfloorcur': bid.params.bidfloorcur,
       'video': {
         'mimes': bid.params.stream.video.mimes,
         'protocols': bid.params.stream.protocols,
@@ -307,7 +309,7 @@ function handleValidRTB2Dot4(bid) {
   return !!(
     bid.params.endpoint &&
         bid.params.userIp &&
-        bid.params.userId &&
+        bid.params.hasOwnProperty('userId') &&
         bid.params.zoneId &&
         bid.params.fid &&
         bid.params.siteId &&

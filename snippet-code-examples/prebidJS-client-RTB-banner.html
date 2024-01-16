@@ -33,7 +33,6 @@
         let bidfloor = 0.00000011;
         let mimes = ['image/jpg'];
         let imageOutput = "html";
-        let videoOutput = "html";
         // Client Conf end
 
         let adUnits = [];
@@ -55,11 +54,6 @@
 
         var pbjs = pbjs || {};
         pbjs.que = pbjs.que || [];
-
-        // Uncomment if you have to debug and set script tag that import prebidJS library as not async)
-        /*pbjs.setConfig({
-            debug: true,
-        });*/
 
         handleRTB();
 
@@ -129,7 +123,6 @@
                         bidfloorcur: bidfloorcur,
                         mimes: mimes,
                         image_output: imageOutput,
-                        video_output: videoOutput,
                         endpoint: exads_endpoint
                     }
                 }]

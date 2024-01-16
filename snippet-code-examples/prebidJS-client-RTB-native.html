@@ -54,7 +54,6 @@
 
         var pbjs = pbjs || {};
         pbjs.que = pbjs.que || [];
-        
 
         handleRTB();
 
@@ -81,6 +80,7 @@
             });
             
             // overriding rendering function based on own needs
+            // rendering function
             pbjs.renderAd = function(iframeDoc, data){
                 let template = "<div><div><\/div><div><h1>##hb_native_title##<\/h1><p>##hb_native_body##<\/p><a href=\"https:\/\/##hb_native_linkurl##\" target=\"_blank\"><img src=\"##hb_native_image##\"><\/a><div> <\/div> <\/div>";
                 let keys = Object.keys(data);
@@ -99,6 +99,7 @@
             if (user_ip.hasOwnProperty('ip')) userIp = user_ip.ip;
         }
 
+        // MurmurHash3 hash function
         function hashCode(str, seed = 0) {
             let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
             for (let i = 0, ch; i < str.length; i++) {
@@ -116,10 +117,9 @@
             code: 'postbid_iframe',
             mediaTypes: {
                 native: {
-                    sendTargetingKeys: true,
                     ortb: {
                         assets: [{
-                            id: 1,
+                            id: 3,
                             required: 1,
                             title: {
                                 len: 124
@@ -133,7 +133,7 @@
                             }
                         },
                         {
-                            id: 3,
+                            id: 1,
                             required: 1,
                             img: {
                                 type: 3,

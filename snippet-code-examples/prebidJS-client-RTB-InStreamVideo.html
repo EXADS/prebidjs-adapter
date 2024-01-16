@@ -11,7 +11,7 @@
     <script async src="js/prebid.js" onload="onScriptLoaded()"></script>
 
     <!-- Fluid Player CSS and JS -->
-    <script src="https://cdn.fluidplayer.com/v3/current/fluidplayer.min.js"></script>
+    <script async src="https://cdn.fluidplayer.com/v3/current/fluidplayer.min.js"></script>
     <script>
         // Client Conf start
         // Set as true for development environments only
@@ -30,9 +30,6 @@
         let country = 'IRL';
         let keywords = 'lifestyle, humour';
         let catIab = ['IAB25-3']; // if available - ex.: ["IAB1-5", "IAB1-7"]
-        let bannerSizes = [
-            [300, 250]
-        ];
         let bidfloorcur = 'EUR';
         let bidfloor = 0.00000011;
         // Client Conf end
@@ -89,6 +86,7 @@
             if (user_ip.hasOwnProperty('ip')) userIp = user_ip.ip;
         }
 
+        // MurmurHash3 hash function
         function hashCode(str, seed = 0) {
             let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
             for (let i = 0, ch; i < str.length; i++) {
@@ -107,9 +105,7 @@
                 mediaTypes: {
                     video: {
                         mimes: ['video/mp4'],
-                        context: 'instream', // or 'outstream'
                         protocols: [3, 6],
-                        divId: 'player', // required to indicate which player is being used to render this ad unit.
                     }
                 },
                 bids: [{
@@ -118,6 +114,7 @@
                         zoneId: zoneId,
                         fid: fid,
                         siteId: siteId,
+                        catIab: ['IAB25-3'],
                         userIp: 0, // DO NOT EDIT - Client side data
                         userId: user_id,
                         impressionId: impression_id.toString(), // DO NOT EDIT - Custom hash
@@ -135,6 +132,8 @@
                         },
                         country: country,
                         keywords: keywords,
+                        bidfloor: bidfloor,
+                        bidfloorcur: bidfloorcur,
                         catIab: catIab,
                         endpoint: exads_endpoint,
                     }
