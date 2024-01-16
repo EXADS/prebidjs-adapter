@@ -1,7 +1,9 @@
 # Overview
 
 **Module Name**: Exads Bidder Adapter
+
 **Module Type**: Bidder Adapter
+
 **Maintainer**: blablabla@exads.com TODO!!!
 
 # Description
