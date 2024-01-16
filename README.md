@@ -42,9 +42,11 @@ module.exports = nodeBundle;
 * Updating the snippet code. You can find it into this repository: ./snippet-code-examples
 
 #### Lint and Unit tests
-* Run `gulp test`
 * Note: lint checks the official prebidJS rules.
-* Also, to do the pull request to official prebidJS team, it is mondatory 80% or more of covarage
+* Also, to do the pull request to official prebidJS team, it is mondatory 80% or more of covarage. 
+* To check the coverage, type:
+* `gulp test-coverage` and then
+* `gulp view-coverage`
 
 #### Manual tests
 * Advisable location to test the adapter is the www-management repository: https://github.com/EXADS/www-management.git

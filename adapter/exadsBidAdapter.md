@@ -4,7 +4,7 @@
 
 **Module Type**: Bidder Adapter
 
-**Maintainer**: blablabla@exads.com TODO!!!
+**Maintainer**: info@exads.com
 
 # Description
 

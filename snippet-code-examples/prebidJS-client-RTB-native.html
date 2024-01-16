@@ -78,19 +78,6 @@
                     }
                 }
             });
-            
-            // overriding rendering function based on own needs
-            // rendering function
-            pbjs.renderAd = function(iframeDoc, data){
-                let template = "<div><div><\/div><div><h1>##hb_native_title##<\/h1><p>##hb_native_body##<\/p><a href=\"https:\/\/##hb_native_linkurl##\" target=\"_blank\"><img src=\"##hb_native_image##\"><\/a><div> <\/div> <\/div>";
-                let keys = Object.keys(data);
-                for (var i = 0; i < keys.length; i++){
-                    template = template.replace("##"+keys[i]+"##",data[keys[i]]);
-                }
-                iframeDoc.open();
-                iframeDoc.write(template);
-                iframeDoc.close();
-            }
         }
 
         // ======== DO NOT EDIT BELOW THIS LINE =========== //
@@ -189,7 +176,16 @@
 
                             // If any bidders return any creatives
                             if (adServerTargeting && adServerTargeting['hb_adid']) {
-                                pbjs.renderAd(iframeDoc, adServerTargeting);
+                                // rendering logic based on own template
+                                let template = "<div><div><\/div><div><h1>##hb_native_title##<\/h1><p>##hb_native_body##<\/p><a href=\"https:\/\/##hb_native_linkurl##\" target=\"_blank\"><img src=\"##hb_native_image##\"><\/a><div> <\/div> <\/div>";
+                                let keys = Object.keys(adServerTargeting);
+                                for (var i = 0; i < keys.length; i++){
+                                    template = template.replace("##"+keys[i]+"##",adServerTargeting[keys[i]]);
+                                }
+                                iframeDoc.open();
+                                iframeDoc.write(template);
+                                iframeDoc.close();
+                                
                             } else {
                                 iframe.width = bannerSizes[0][0];
                                 iframe.height = bannerSizes[0][1];

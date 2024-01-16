@@ -61,7 +61,7 @@ function handleReqRTB2Dot4(bid, endpointUrl, validBidRequests, bidderRequest) {
     }
   };
 
-  if(gdprConsent && gdprConsent.gdprApplies) {
+  if (gdprConsent && gdprConsent.gdprApplies) {
     bidRequestData.user['ext'] = {
       consent: gdprConsent.consentString
     }
@@ -317,7 +317,7 @@ function handleValidRTB2Dot4(bid) {
         bid.params.country &&
         bid.params.country.length > 0 &&
         (bannerInfo || nativeInfo || videoInfo) &&
-        (bannerInfo || nativeInfo ? !!(bid.params.bidfloor && bid.params.bidfloorcur) : true) &&
+        !!(bid.params.bidfloor && bid.params.bidfloorcur) &&
         (nativeInfo ? !!(bid.params.native &&
             bid.params.native.plcmtcnt) : true) &&
         (videoInfo ? !!(bid.params.stream &&
