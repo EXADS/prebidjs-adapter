@@ -13,8 +13,9 @@
         // Set as true for development environments only
         const isEnabledDebug = false;
         const exads_endpoint = 'https://rtb.exads.rocks/rtb.php';
-        let zoneId = 5147495;
-        let fid = "cb862e3a162480d64970fe7ff46eab674d57e566";
+        const partner = 'rtb_2_4';
+        let zoneId = 5179863;
+        let fid = "a1891f9f74cb728ad9583e0fb0eb5feae741292c";
 
         // Start GDPR params
         let isGDPRRequested = false;
@@ -108,10 +109,11 @@
                 }
             },
             bids: [{
-                bidder: 'exadsadserver_rtb_2_4',
+                bidder: 'exadsadserver',
                 params: {
                         zoneId: zoneId,
                         fid: fid,
+                        partner: partner,
                         siteId: siteId,
                         catIab: catIab,
                         userIp: 0,

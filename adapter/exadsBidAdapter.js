@@ -2,8 +2,10 @@ import * as utils from '../src/utils.js';
 import { BANNER, NATIVE, VIDEO } from '../src/mediaTypes.js';
 import { registerBidder } from '../src/adapters/bidderFactory.js';
 
-const BIDDER_CODES = {
-  RTB_2_4: 'exadsadserver_rtb_2_4'
+const BIDDER = 'exadsadserver';
+
+const PARTNERS = {
+  RTB_2_4: 'rtb_2_4'
 };
 
 const envParams = {
@@ -17,7 +19,7 @@ const envParams = {
 };
 
 const adPartnerHandlers = {
-  [BIDDER_CODES.RTB_2_4]: {
+  [PARTNERS.RTB_2_4]: {
     request: handleReqRTB2Dot4,
     response: handleResRTB2Dot4,
     validation: handleValidRTB2Dot4,
@@ -257,7 +259,7 @@ function makeBidRequest(url, data) {
 
 function getUrl(adPartner, bid) {
   let endpointUrlMapping = {
-    [BIDDER_CODES.RTB_2_4]: bid.params.endpoint + '?idzone=' + bid.params.zoneId + '&fid=' + bid.params.fid
+    [PARTNERS.RTB_2_4]: bid.params.endpoint + '?idzone=' + bid.params.zoneId + '&fid=' + bid.params.fid
   };
 
   return endpointUrlMapping[adPartner] ? endpointUrlMapping[adPartner] : 'defaultEndpoint';
@@ -305,27 +307,33 @@ function handleValidRTB2Dot4(bid) {
   const bannerInfo = bid.mediaTypes?.banner;
   const nativeInfo = bid.mediaTypes?.native;
   const videoInfo = bid.mediaTypes?.video;
-
-  return !!(
+  const isValid = !!(
     bid.params.endpoint &&
-        bid.params.userIp &&
-        bid.params.hasOwnProperty('userId') &&
-        bid.params.zoneId &&
-        bid.params.fid &&
-        bid.params.siteId &&
-        bid.params.impressionId &&
-        bid.params.country &&
-        bid.params.country.length > 0 &&
-        (bannerInfo || nativeInfo || videoInfo) &&
-        !!(bid.params.bidfloor && bid.params.bidfloorcur) &&
-        (nativeInfo ? !!(bid.params.native &&
-            bid.params.native.plcmtcnt) : true) &&
-        (videoInfo ? !!(bid.params.stream &&
-            bid.params.stream.video &&
-            bid.params.stream.video.mimes &&
-            bid.params.stream.video.mimes.length > 0 &&
-            bid.params.stream.protocols &&
-            bid.params.stream.protocols.length > 0) : true));
+    bid.params.userIp &&
+    bid.params.hasOwnProperty('userId') &&
+    bid.params.zoneId &&
+    bid.params.partner &&
+    bid.params.fid &&
+    bid.params.siteId &&
+    bid.params.impressionId &&
+    bid.params.country &&
+    bid.params.country.length > 0 &&
+    (bannerInfo || nativeInfo || videoInfo) &&
+    !!(bid.params.bidfloor && bid.params.bidfloorcur) &&
+    (nativeInfo ? !!(bid.params.native &&
+      bid.params.native.plcmtcnt) : true) &&
+    (videoInfo ? !!(bid.params.stream &&
+      bid.params.stream.video &&
+      bid.params.stream.video.mimes &&
+      bid.params.stream.video.mimes.length > 0 &&
+      bid.params.stream.protocols &&
+      bid.params.stream.protocols.length > 0) : true));
+
+  if (!isValid) {
+    utils.logError('Validation Error');
+  }
+
+  return isValid;
 }
 
 function hasValue(value) {
@@ -353,7 +361,19 @@ export const spec = {
   supportedMediaTypes: [BANNER, NATIVE, VIDEO],
   isBidRequestValid: function (bid) {
     utils.logInfo('on isBidRequestValid -> bid:', bid);
-    let adPartner = bid.bidder;
+
+    if (bid.bidder !== BIDDER) {
+      utils.logError('Validation Error', 'bidder wrong');
+      return false;
+    } else if (!bid.params.partner) {
+      utils.logError('Validation Error', 'bid.params.partner missed');
+      return false;
+    } else if (!Object.values(PARTNERS).includes(bid.params.partner)) {
+      utils.logError('Validation Error', 'bid.params.partner is not valid');
+      return false;
+    }
+
+    let adPartner = bid.params.partner;
 
     if (adPartnerHandlers[adPartner] && adPartnerHandlers[adPartner]['validation']) {
       return adPartnerHandlers[adPartner]['validation'](bid);
@@ -367,7 +387,7 @@ export const spec = {
     utils.logInfo('on buildRequests -> bidderRequest:', bidderRequest);
 
     return validBidRequests.map(bid => {
-      let adPartner = bid.bidder;
+      let adPartner = bid.params.partner;
 
       imps.set(bid.params.impressionId, adPartner);
 
@@ -395,12 +415,6 @@ export const spec = {
       return null;
     }
   },
-  getUserSyncs: function (syncOptions, serverResponses, gdprConsent, uspConsent) {
-    utils.logInfo(`on getUserSyncs -> syncOptions:`, syncOptions);
-    utils.logInfo(`on getUserSyncs -> serverResponses:`, serverResponses);
-    utils.logInfo(`on getUserSyncs -> gdprConsent:`, gdprConsent);
-    utils.logInfo(`on getUserSyncs -> uspConsent:`, uspConsent);
-  },
   onTimeout: function (timeoutData) {
     utils.logWarn(`onTimeout -> timeoutData:`, timeoutData);
   },
@@ -416,6 +430,6 @@ export const spec = {
 };
 
 registerBidder({
-  code: BIDDER_CODES.RTB_2_4,
+  code: BIDDER,
   ...spec
 });

@@ -51,6 +51,7 @@ pbjs.setConfig({
 
 * **zoneId** (required) - you can get it from the endpoint created after configuring the zones (integer)
 * **fid** (required) - you can get it from the endpoint created after configuring the zones (string)
+* **partner** (required) - currently we support rtb 2.4 ("rtb_2_4") only (string)
 * **siteId** (recommended) - unique Site ID (string)
 * **banner.sizes** (required) - One array of integer - [width, height]
 * **catIab** - IAB category ID (array of string)
@@ -77,10 +78,11 @@ adUnits =
             }
         },
         bids: [{
-            bidder: 'exadsadserver_rtb_2_4',
+            bidder: 'exadsadserver',
             params: {
                     zoneId: 12345,
                     fid: '829a896f011475d50da0d82cfdd1af8d9cdb07ff',
+                    partner: 'rtb_2_4',
                     siteId: '123',
                     catIab: ['IAB17-15'],
                     userIp: '0.0.0.0',
@@ -110,10 +112,11 @@ adUnits =
             }
         },
         bids: [{
-            bidder: 'exadsadserver_rtb_2_4',
+            bidder: 'exadsadserver',
             params: {
                     zoneId: 12345,
                     fid: '829a896f011475d50da0d82cfdd1af8d9cdb07ff',
+                    partner: 'rtb_2_4',
                     siteId: '123',
                     catIab: ['IAB17-15'],
                     userIp: '0.0.0.0',
@@ -135,6 +138,7 @@ adUnits =
 
 * **zoneId** (required) - you can get it from the endpoint created after configuring the zones (integer)
 * **fid** (required) - you can get it from the endpoint created after configuring the zones (string)
+* **partner** (required) - currently we support rtb 2.4 ("rtb_2_4") only (string)
 * **siteId** (recommended) - unique Site ID (string)
 * **catIab** - IAB category ID (array of string)
 * **userIp** (required) - IP address of the user (string)*
@@ -160,10 +164,11 @@ adUnits = [{
         }
     },
     bids: [{
-        bidder: 'exadsadserver_rtb_2_4',
+        bidder: 'exadsadserver',
         params: {
             zoneId: 12345,
             fid: '829a896f011475d50da0d82cfdd1af8d9cdb07ff',
+            partner: 'rtb_2_4',
             siteId: '123',
             catIab: ['IAB17-15'],
             userIp: '0.0.0.0',
@@ -195,6 +200,7 @@ adUnits = [{
 
 * **zoneId** (required) - you can get it from the endpoint created after configuring the zones (integer)
 * **fid** (required) - you can get it from the endpoint created after configuring the zones (string)
+* **partner** (required) - currently we support rtb 2.4 ("rtb_2_4") only (string)
 * **siteId** (recommended) - unique Site ID (string)
 * **catIab** - IAB category ID (array of string)
 * **userIp** (required) - IP address of the user (string)*
@@ -256,10 +262,11 @@ adUnits = [{
         },
     },
     bids: [{
-        bidder: 'exadsadserver_rtb_2_4',
+        bidder: 'exadsadserver',
         params: {
                 zoneId: 12345,
                 fid: '829a896f011475d50da0d82cfdd1af8d9cdb07ff',
+                partner: 'rtb_2_4',
                 siteId: '123',
                 catIab: ['IAB17-15'],
                 userIp: '0.0.0.0',

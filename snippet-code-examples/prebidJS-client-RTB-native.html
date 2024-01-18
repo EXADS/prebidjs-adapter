@@ -4,16 +4,17 @@
     <meta charset="UTF-8">
     <title>Prebid.js</title>
     <!-- Uncomment for development environments -->
-    <!-- <script src="js/prebid.js"></script> -->
+    <script src="js/prebid.js"></script>
     <!-- Uncomment for production environments -->
-    <script async src="js/prebid.js" onload="onScriptLoaded()"></script>
+    <!-- <script async src="js/prebid.js" onload="onScriptLoaded()"></script> -->
     <script>
         // Client Conf start
         // Set as true for development environments only
-        const isEnabledDebug = false;
+        const isEnabledDebug = true;
         const exads_endpoint = 'https://rtb.exads.rocks/rtb.php';
-        let zoneId = 5147487;
-        let fid = "4695aca948cc0207bf78099f282b0f98fa3d98bc";
+        let zoneId = 5179867;
+        let fid = "1e284a9540445fad9ac9c64881569260f1aa195f";
+        const partner = 'rtb_2_4';
 
         // Start GDPR params
         let isGDPRRequested = false;
@@ -132,10 +133,11 @@
                 },
             },
             bids: [{
-                bidder: 'exadsadserver_rtb_2_4',
+                bidder: 'exadsadserver',
                 params: {
                         zoneId: zoneId,
                         fid: fid,
+                        partner: partner,
                         siteId: siteId,
                         catIab: catIab,
                         keywords: keywords,
