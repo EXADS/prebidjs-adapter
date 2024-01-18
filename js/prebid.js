@@ -1,5 +1,5 @@
 /* prebid.js v8.24.0-pre
-Updated: 2024-01-16
+Updated: 2024-01-18
 Modules: consentManagement, exadsBidAdapter */
 
 if (!window.pbjs || !window.pbjs.libLoaded) {
@@ -14547,8 +14547,9 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 
 
-var BIDDER_CODES = {
-  RTB_2_4: 'exadsadserver_rtb_2_4'
+var BIDDER = 'exadsadserver';
+var PARTNERS = {
+  RTB_2_4: 'rtb_2_4'
 };
 var envParams = {
   lang: '',
@@ -14559,7 +14560,7 @@ var envParams = {
   language: '',
   userId: ''
 };
-var adPartnerHandlers = (0,_babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0__["default"])({}, BIDDER_CODES.RTB_2_4, {
+var adPartnerHandlers = (0,_babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0__["default"])({}, PARTNERS.RTB_2_4, {
   request: handleReqRTB2Dot4,
   response: handleResRTB2Dot4,
   validation: handleValidRTB2Dot4
@@ -14771,7 +14772,7 @@ function makeBidRequest(url, data) {
   };
 }
 function getUrl(adPartner, bid) {
-  var endpointUrlMapping = (0,_babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0__["default"])({}, BIDDER_CODES.RTB_2_4, bid.params.endpoint + '?idzone=' + bid.params.zoneId + '&fid=' + bid.params.fid);
+  var endpointUrlMapping = (0,_babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0__["default"])({}, PARTNERS.RTB_2_4, bid.params.endpoint + '?idzone=' + bid.params.zoneId + '&fid=' + bid.params.fid);
   return endpointUrlMapping[adPartner] ? endpointUrlMapping[adPartner] : 'defaultEndpoint';
 }
 function manageEnvParams() {
@@ -14811,7 +14812,11 @@ function handleValidRTB2Dot4(bid) {
   var bannerInfo = (_bid$mediaTypes = bid.mediaTypes) === null || _bid$mediaTypes === void 0 ? void 0 : _bid$mediaTypes.banner;
   var nativeInfo = (_bid$mediaTypes2 = bid.mediaTypes) === null || _bid$mediaTypes2 === void 0 ? void 0 : _bid$mediaTypes2.native;
   var videoInfo = (_bid$mediaTypes3 = bid.mediaTypes) === null || _bid$mediaTypes3 === void 0 ? void 0 : _bid$mediaTypes3.video;
-  return !!(bid.params.endpoint && bid.params.userIp && bid.params.hasOwnProperty('userId') && bid.params.zoneId && bid.params.fid && bid.params.siteId && bid.params.impressionId && bid.params.country && bid.params.country.length > 0 && (bannerInfo || nativeInfo || videoInfo) && (bannerInfo || nativeInfo ? !!(bid.params.bidfloor && bid.params.bidfloorcur) : true) && (nativeInfo ? !!(bid.params.native && bid.params.native.plcmtcnt) : true) && (videoInfo ? !!(bid.params.stream && bid.params.stream.video && bid.params.stream.video.mimes && bid.params.stream.video.mimes.length > 0 && bid.params.stream.protocols && bid.params.stream.protocols.length > 0) : true));
+  var isValid = !!(bid.params.endpoint && bid.params.userIp && bid.params.hasOwnProperty('userId') && bid.params.zoneId && bid.params.partner && bid.params.fid && bid.params.siteId && bid.params.impressionId && bid.params.country && bid.params.country.length > 0 && (bannerInfo || nativeInfo || videoInfo) && !!(bid.params.bidfloor && bid.params.bidfloorcur) && (nativeInfo ? !!(bid.params.native && bid.params.native.plcmtcnt) : true) && (videoInfo ? !!(bid.params.stream && bid.params.stream.video && bid.params.stream.video.mimes && bid.params.stream.video.mimes.length > 0 && bid.params.stream.protocols && bid.params.stream.protocols.length > 0) : true));
+  if (!isValid) {
+    _src_utils_js__WEBPACK_IMPORTED_MODULE_1__.logError('Validation Error');
+  }
+  return isValid;
 }
 function hasValue(value) {
   return value !== undefined && value !== null;
@@ -14830,7 +14835,17 @@ var spec = {
   supportedMediaTypes: [_src_mediaTypes_js__WEBPACK_IMPORTED_MODULE_3__.BANNER, _src_mediaTypes_js__WEBPACK_IMPORTED_MODULE_3__.NATIVE, _src_mediaTypes_js__WEBPACK_IMPORTED_MODULE_3__.VIDEO],
   isBidRequestValid: function isBidRequestValid(bid) {
     _src_utils_js__WEBPACK_IMPORTED_MODULE_1__.logInfo('on isBidRequestValid -> bid:', bid);
-    var adPartner = bid.bidder;
+    if (bid.bidder !== BIDDER) {
+      _src_utils_js__WEBPACK_IMPORTED_MODULE_1__.logError('Validation Error', 'bidder wrong');
+      return false;
+    } else if (!bid.params.partner) {
+      _src_utils_js__WEBPACK_IMPORTED_MODULE_1__.logError('Validation Error', 'bid.params.partner missed');
+      return false;
+    } else if (!Object.values(PARTNERS).includes(bid.params.partner)) {
+      _src_utils_js__WEBPACK_IMPORTED_MODULE_1__.logError('Validation Error', 'bid.params.partner is not valid');
+      return false;
+    }
+    var adPartner = bid.params.partner;
     if (adPartnerHandlers[adPartner] && adPartnerHandlers[adPartner]['validation']) {
       return adPartnerHandlers[adPartner]['validation'](bid);
     } else {
@@ -14842,7 +14857,7 @@ var spec = {
     _src_utils_js__WEBPACK_IMPORTED_MODULE_1__.logInfo('on buildRequests -> validBidRequests:', validBidRequests);
     _src_utils_js__WEBPACK_IMPORTED_MODULE_1__.logInfo('on buildRequests -> bidderRequest:', bidderRequest);
     return validBidRequests.map(function (bid) {
-      var adPartner = bid.bidder;
+      var adPartner = bid.params.partner;
       imps.set(bid.params.impressionId, adPartner);
       var endpointUrl = getUrl(adPartner, bid);
 
@@ -14868,12 +14883,6 @@ var spec = {
       return null;
     }
   },
-  getUserSyncs: function getUserSyncs(syncOptions, serverResponses, gdprConsent, uspConsent) {
-    _src_utils_js__WEBPACK_IMPORTED_MODULE_1__.logInfo("on getUserSyncs -> syncOptions:", syncOptions);
-    _src_utils_js__WEBPACK_IMPORTED_MODULE_1__.logInfo("on getUserSyncs -> serverResponses:", serverResponses);
-    _src_utils_js__WEBPACK_IMPORTED_MODULE_1__.logInfo("on getUserSyncs -> gdprConsent:", gdprConsent);
-    _src_utils_js__WEBPACK_IMPORTED_MODULE_1__.logInfo("on getUserSyncs -> uspConsent:", uspConsent);
-  },
   onTimeout: function onTimeout(timeoutData) {
     _src_utils_js__WEBPACK_IMPORTED_MODULE_1__.logWarn("onTimeout -> timeoutData:", timeoutData);
   },
@@ -14888,7 +14897,7 @@ var spec = {
   }
 };
 (0,_src_adapters_bidderFactory_js__WEBPACK_IMPORTED_MODULE_4__.registerBidder)(_objectSpread({
-  code: BIDDER_CODES.RTB_2_4
+  code: BIDDER
 }, spec));
 (0,_src_prebidGlobal_js__WEBPACK_IMPORTED_MODULE_5__.registerModule)('exadsBidAdapter');
 
